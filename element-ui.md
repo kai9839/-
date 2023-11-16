@@ -14,7 +14,7 @@
 
 
 
-### 2.1.aside组件
+**aside组件**
 
 ```vue
 <template>
@@ -147,7 +147,7 @@ export default {
 </style>
 ```
 
-### 2.2.menuNav组件
+**menuNav组件**
 
 ```vue
 <template>
@@ -182,3 +182,35 @@ export default {
 
 **总结**：当遇到多叉树或无限层级问题时，vue的递归组件是个比较好的解决方案，可以较大的节约开发时间降低开发成本。
 
+## 3.使用el-breadcrumb面包屑重复点击会报错
+
+```
+NavigationDuplicated: Avoided redundant navigation to current location: "……".
+```
+
+翻译后为：NavigationDuplicated：避免了对当前位置的冗余导航：“/discover/recommend”。 大意是你娃点过了又老是点我的烦不烦（路由重复）。
+**解决**：在 src/router 目录下，找到你的路由配置文件，在这个位置贴上这个代码
+
+![img](https://upload-images.jianshu.io/upload_images/27424234-aa3969ae45080da2.png?imageMogr2/auto-orient/strip|imageView2/2/w/895/format/webp)
+
+```
+import Vue from "vue";
+import VueRouter from "vue-router";
+
+// 获取原型对象上的push函数
+const originalPush = VueRouter.prototype.push
+// 修改原型对象中的push方法
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
+Vue.use(VueRouter);
+```
+
+**可能会出现问题**
+
+![image-20231110110215447](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20231110110215447.png)
+
+**最后**，因为是路由重复的问题，我决定修改to属性，当要跳转的路径和当前路径相同时，返回false
+
+![image-20231110111024031](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20231110111024031.png)
